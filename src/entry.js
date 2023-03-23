@@ -31,12 +31,14 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 let resolution = 5;
 let cubeSize = 0.8;
 
+let data = [];
+
 const scene = new Scene();
 scene.background = new Color(0x444444);
 scene.fog = new Fog(0x000000, 0, resolution * 4);
-const light = new AmbientLight( 0xffffff, 0.3 ); // soft white light
+const light = new AmbientLight( 0xff8888, 0.3 ); // soft white light
 scene.add( light );
-const directionalLight = new DirectionalLight( 0xffffff, 0.9 );
+const directionalLight = new DirectionalLight( 0x99ff99, 0.9 );
 directionalLight.position.set( resolution/2, resolution/3, resolution/4);
 directionalLight.target.position.set( 0, 0, 0 );
 directionalLight.castShadow = true;
@@ -73,11 +75,14 @@ cube.scale.set(resolution, resolution, resolution);
 //scene.add(cube);
 
 for (let x = 0; x < resolution; x++) {
+  data.push([]);
   for (let y = 0; y < resolution; y++) {
+    data[x].push([]);
     for (let z = 0; z < resolution; z++) {
+      data[x][y].push(0);
       let geometry = new BoxGeometry(cubeSize, cubeSize, cubeSize);
       let material = new MeshPhongMaterial({
-        color: 0xffffff,
+        color: 0xaaaaff,
         //wireframe: false,
         fog: true,
         //depthWrite: true,
@@ -90,7 +95,9 @@ for (let x = 0; x < resolution; x++) {
         y - resolution / 2 + 0.5,
         z - resolution / 2 + 0.5
       );
+      cube.scale.set(Math.random(), Math.random(), Math.random());
       scene.add(cube);
+      data[x][y][z] = cube;
     }
   }
 }
@@ -110,10 +117,25 @@ renderer.setClearColor(0x7ec0ee, 1);
 const onAnimationFrameHandler = (timeStamp) => {
   renderer.render(scene, camera);
   //seedScene.update && seedScene.update(timeStamp);
+  dataUpdate();
   controls.update();
   window.requestAnimationFrame(onAnimationFrameHandler);
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
+
+const dataUpdate = () => {
+  for (let x = 0; x < resolution; x++) {
+    for (let y = 0; y < resolution; y++) {
+      for (let z = 0; z < resolution; z++) {
+        let cube = data[x][y][z];
+        cube.rotation.x += 0.001;
+        cube.rotation.y += 0.001;
+        cube.rotation.z += 0.001;
+        //data[x][y][z].scale.set(Math.random(), Math.random(), Math.random());
+      }
+    }
+  }
+};
 
 // resize
 const windowResizeHanlder = () => {
